@@ -26,13 +26,13 @@
 #include <string.h>
 #include <time.h>
 #include <math.h>
-#include <SWI-prolog.h>
-#include <SWI-stream.h>
+#include <SWI-Prolog.h>
+#include <SWI-Stream.h>
 #include "plfann.h"
 
 
 #ifdef FANN_FLOAT
-__forceinline int PL_get_float32 ( term_t in, float* out ) {
+__inline int PL_get_float32 ( term_t in, float* out ) {
 
 	double tmp;
 	int exit = PL_get_float ( in, &tmp );
@@ -44,7 +44,7 @@ __forceinline int PL_get_float32 ( term_t in, float* out ) {
 #endif
 
 
-enum fann_activationfunc_enum lookup_activationfunc_enum ( char *type ) { 
+enum fann_activationfunc_enum lookup_activationfunc_enum ( char *type ) {
 
 	if ( !strcmp ( "FANN_ELLIOT", type ) ) return FANN_ELLIOT;
 	if ( !strcmp ( "FANN_ELLIOT_SYMMETRIC", type ) ) return FANN_ELLIOT_SYMMETRIC;
@@ -52,9 +52,9 @@ enum fann_activationfunc_enum lookup_activationfunc_enum ( char *type ) {
 	if ( !strcmp ( "FANN_SIGMOID_SYMMETRIC_STEPWISE", type ) ) return FANN_SIGMOID_SYMMETRIC_STEPWISE;
 	if ( !strcmp ( "FANN_SIGMOID", type ) ) return FANN_SIGMOID;
 	if ( !strcmp ( "FANN_SIGMOID_STEPWISE", type ) ) return FANN_SIGMOID_STEPWISE;
-	if ( !strcmp ( "FANN_LINEAR", type ) ) return FANN_LINEAR; 
-	if ( !strcmp ( "FANN_THRESHOLD", type ) ) return FANN_THRESHOLD; 
-	if ( !strcmp ( "FANN_THRESHOLD_SYMMETRIC", type ) ) return FANN_THRESHOLD_SYMMETRIC; 
+	if ( !strcmp ( "FANN_LINEAR", type ) ) return FANN_LINEAR;
+	if ( !strcmp ( "FANN_THRESHOLD", type ) ) return FANN_THRESHOLD;
+	if ( !strcmp ( "FANN_THRESHOLD_SYMMETRIC", type ) ) return FANN_THRESHOLD_SYMMETRIC;
 	if ( !strcmp ( "FANN_GAUSSIAN", type ) ) return FANN_GAUSSIAN;
 	if ( !strcmp ( "FANN_GAUSSIAN_SYMMETRIC", type ) ) return FANN_GAUSSIAN_SYMMETRIC;
 	if ( !strcmp ( "FANN_GAUSSIAN_STEPWISE", type ) ) return FANN_GAUSSIAN_STEPWISE;
@@ -64,7 +64,7 @@ enum fann_activationfunc_enum lookup_activationfunc_enum ( char *type ) {
 	if ( !strcmp ( "FANN_COS_SYMMETRIC", type ) ) return FANN_COS_SYMMETRIC;
 	if ( !strcmp ( "FANN_SIN", type ) ) return FANN_SIN;
 	if ( !strcmp ( "FANN_COS", type ) ) return FANN_COS;
-	
+
 	// Error, needs to be treated
 	return (enum fann_activationfunc_enum) -1;
 }
@@ -170,7 +170,7 @@ foreign_t swi_fann_create_sparse_array ( term_t connection_rate_pt, term_t layer
 	double connection_rate;
 	term_t layer_pt = PL_new_term_ref ();
 
-	PL_get_float ( connection_rate_pt, &connection_rate );		
+	PL_get_float ( connection_rate_pt, &connection_rate );
 
 	while ( PL_get_list ( layers_pt, layer_pt, layers_pt ) ) {
 
@@ -224,7 +224,7 @@ foreign_t swi_fann_copy ( term_t ann1_pt, term_t ann2_pt ) {
 
 
 foreign_t swi_fann_run ( term_t ann_pt, term_t input_pt, term_t output_pt ) {
-	
+
 	unsigned int i, num_input;
 	fann_type *input, *output;
 	term_t temp_pt = PL_new_term_ref ();
@@ -237,7 +237,7 @@ foreign_t swi_fann_run ( term_t ann_pt, term_t input_pt, term_t output_pt ) {
 
 	for ( i = 0; i < num_input; i++ ) {
 
-		if ( !PL_unify_list ( input_pt, temp_pt, input_pt ) || 
+		if ( !PL_unify_list ( input_pt, temp_pt, input_pt ) ||
 			 !PL_FANN_GET_FANNTYPE(temp_pt,input+i) ) PL_fail;
 	}
 	PL_unify_nil ( input_pt );
@@ -263,7 +263,7 @@ foreign_t swi_fann_randomize_weights ( term_t ann_pt, term_t min_weight_pt, term
 	fann_type min_weight, max_weight;
 	void *ann;
 
-	if ( !PL_get_pointer ( ann_pt, &ann ) || 
+	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_FANN_GET_FANNTYPE(min_weight_pt,&min_weight) ||
 		 !PL_FANN_GET_FANNTYPE(max_weight_pt,&max_weight) ) PL_fail;
 
@@ -277,7 +277,7 @@ foreign_t swi_fann_init_weights ( term_t ann_pt, term_t train_data_pt ) {
 
 	void *ann, *train_data;
 
-	if ( !PL_get_pointer ( ann_pt, &ann ) || 
+	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_pointer ( train_data_pt, &train_data ) ) PL_fail;
 
 	fann_init_weights ( ann, train_data );
@@ -392,8 +392,8 @@ foreign_t swi_fann_get_layer_array ( term_t ann_pt, term_t lay_arr_pt ) {
 	fann_get_layer_array ( ann, temp );
 
 	for ( i = 0; i < fann_get_num_layers( ann ); i++ ) {
-		
-		if ( !PL_unify_list ( lay_arr_pt, temp_pt, lay_arr_pt ) || 
+
+		if ( !PL_unify_list ( lay_arr_pt, temp_pt, lay_arr_pt ) ||
 			 !PL_unify_integer ( temp_pt, temp[i] ) ) PL_fail;
 	}
 
@@ -412,8 +412,8 @@ foreign_t swi_fann_get_bias_array ( term_t ann_pt, term_t lay_arr_pt ) {
 	fann_get_bias_array ( ann, temp );
 
 	for ( i = 0; i < fann_get_num_layers( ann ) - 1; i++ ) {
-		
-		if ( !PL_unify_list ( lay_arr_pt, temp_pt, lay_arr_pt ) || 
+
+		if ( !PL_unify_list ( lay_arr_pt, temp_pt, lay_arr_pt ) ||
 			 !PL_unify_integer ( temp_pt, temp[i] ) ) PL_fail;
 	}
 
@@ -437,23 +437,23 @@ foreign_t swi_fann_get_connection_array ( term_t ann_pt, term_t connections_pt )
 	fann_get_connection_array ( ann, connections );
 
 	for ( i = 0; i < total_connections; i++ ) {
-	
+
 		PL_unify_list ( connections_pt, connection_pt, connections_pt );
-	
+
 			PL_unify_list ( connection_pt, temp_pt, connection_pt );
 			PL_unify_integer ( temp_pt, (connections+i)->from_neuron );
-					
+
 			PL_unify_list ( connection_pt, temp_pt, connection_pt );
 			PL_unify_integer ( temp_pt, (connections+i)->to_neuron );
-					
+
 			PL_unify_list ( connection_pt, temp_pt, connection_pt );
 			PL_FANN_UNIFY_FANNTYPE( temp_pt, (connections+i)->weight );
-					
+
 			PL_unify_nil ( connection_pt );
 	}
 
 	PL_unify_nil ( connections_pt );
-	
+
 	PL_free ( connections );
 
 	PL_succeed;
@@ -471,7 +471,7 @@ foreign_t swi_fann_set_weight_array ( term_t ann_pt, term_t connections_pt ) {
 	if ( !PL_get_pointer ( ann_pt, &ann ) ) PL_fail;
 
 	connections = PL_malloc ( sizeof ( struct fann_connection ) * fann_get_total_connections ( ann ) );
-		
+
 	for ( i = 0; PL_unify_list ( connections_pt, connection_pt, connections_pt ); i++ ) {
 
 			PL_unify_list ( connection_pt, temp_pt, connection_pt );
@@ -558,7 +558,7 @@ foreign_t swi_fann_get_multiplier ( term_t ann_pt, term_t mul_pt ) {
 #endif
 
 
-foreign_t swi_fann_train ( term_t ann_pt, term_t input_pt, term_t output_pt ) { 
+foreign_t swi_fann_train ( term_t ann_pt, term_t input_pt, term_t output_pt ) {
 
 	unsigned int i, num_input, num_output;
 	fann_type *input, *output;
@@ -575,14 +575,14 @@ foreign_t swi_fann_train ( term_t ann_pt, term_t input_pt, term_t output_pt ) {
 
 	for ( i = 0; i < num_input; i++ ) {
 
-		if ( !PL_unify_list ( input_pt, temp_pt, input_pt ) || 
+		if ( !PL_unify_list ( input_pt, temp_pt, input_pt ) ||
 			 !PL_FANN_GET_FANNTYPE(temp_pt,input+i) ) PL_fail;
 	}
 	PL_unify_nil ( input_pt );
 
 	for ( i = 0; i < num_output; i++ ) {
 
-		if ( !PL_unify_list ( output_pt, temp_pt, output_pt ) || 
+		if ( !PL_unify_list ( output_pt, temp_pt, output_pt ) ||
 			 !PL_FANN_GET_FANNTYPE(temp_pt,output+i) ) PL_fail;
 	}
 	PL_unify_nil ( output_pt );
@@ -596,7 +596,7 @@ foreign_t swi_fann_train ( term_t ann_pt, term_t input_pt, term_t output_pt ) {
 }
 
 
-foreign_t swi_fann_test ( term_t ann_pt, term_t input_pt, term_t output_pt ) { 
+foreign_t swi_fann_test ( term_t ann_pt, term_t input_pt, term_t output_pt ) {
 
 	unsigned int i, num_input, num_output;
 	fann_type *input, *output;
@@ -613,14 +613,14 @@ foreign_t swi_fann_test ( term_t ann_pt, term_t input_pt, term_t output_pt ) {
 
 	for ( i = 0; i < num_input; i++ ) {
 
-		if ( !PL_unify_list ( input_pt, temp_pt, input_pt ) || 
+		if ( !PL_unify_list ( input_pt, temp_pt, input_pt ) ||
 			 !PL_FANN_GET_FANNTYPE(temp_pt,input+i) ) PL_fail;
 	}
 	PL_unify_nil ( input_pt );
 
 	for ( i = 0; i < num_output; i++ ) {
 
-		if ( !PL_unify_list ( output_pt, temp_pt, output_pt ) || 
+		if ( !PL_unify_list ( output_pt, temp_pt, output_pt ) ||
 			 !PL_FANN_GET_FANNTYPE(temp_pt,output+i) ) PL_fail;
 	}
 	PL_unify_nil ( output_pt );
@@ -672,10 +672,10 @@ foreign_t swi_fann_train_on_data ( term_t ann_pt, term_t data_pt, term_t max_epo
 	unsigned int max_epochs, epochs_between_reports;
 	double desired_error;
 
-	if ( !PL_get_pointer ( ann_pt, &ann ) || 
+	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_pointer ( data_pt, &data ) ||
-		 !PL_get_integer ( max_epochs_pt, &max_epochs ) ||	
-         !PL_get_integer ( epochs_between_reports_pt, &epochs_between_reports ) || 
+		 !PL_get_integer ( max_epochs_pt, &max_epochs ) ||
+         !PL_get_integer ( epochs_between_reports_pt, &epochs_between_reports ) ||
 		 !PL_get_float ( desired_error_pt, &desired_error ) ) PL_fail;
 
 	fann_train_on_data(ann, data, max_epochs, epochs_between_reports, (float) desired_error );
@@ -684,17 +684,17 @@ foreign_t swi_fann_train_on_data ( term_t ann_pt, term_t data_pt, term_t max_epo
 }
 
 
-foreign_t swi_fann_train_on_file ( term_t ann_pt, term_t file_pt, term_t max_epochs_pt, term_t epochs_between_reports_pt, term_t desired_error_pt ) { 
+foreign_t swi_fann_train_on_file ( term_t ann_pt, term_t file_pt, term_t max_epochs_pt, term_t epochs_between_reports_pt, term_t desired_error_pt ) {
 
 	void *ann;
 	char *file;
 	unsigned int max_epochs, epochs_between_reports;
 	double desired_error;
 
-	if ( !PL_get_pointer ( ann_pt, &ann ) || 
-		 !PL_get_file_name ( file_pt, &file, PL_FILE_ABSOLUTE || PL_FILE_SEARCH || PL_FILE_EXIST ) || 
-		 !PL_get_integer ( max_epochs_pt, &max_epochs ) ||	
-         !PL_get_integer ( epochs_between_reports_pt, &epochs_between_reports ) || 
+	if ( !PL_get_pointer ( ann_pt, &ann ) ||
+		 !PL_get_file_name ( file_pt, &file, PL_FILE_ABSOLUTE || PL_FILE_SEARCH || PL_FILE_EXIST ) ||
+		 !PL_get_integer ( max_epochs_pt, &max_epochs ) ||
+         !PL_get_integer ( epochs_between_reports_pt, &epochs_between_reports ) ||
 		 !PL_get_float ( desired_error_pt, &desired_error ) ) PL_fail;
 
     fann_train_on_file ( ann, file, max_epochs, epochs_between_reports, (float) desired_error );
@@ -703,12 +703,12 @@ foreign_t swi_fann_train_on_file ( term_t ann_pt, term_t file_pt, term_t max_epo
 }
 
 
-foreign_t swi_fann_train_epoch ( term_t ann_pt, term_t data_pt ) { 
+foreign_t swi_fann_train_epoch ( term_t ann_pt, term_t data_pt ) {
 
 	void *ann, *data;
 	double MSE;
 
-	if ( !PL_get_pointer ( ann_pt, &ann ) || 
+	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_pointer ( data_pt, &data ) ) PL_fail;
 
     fann_train_epoch ( ann, data );
@@ -717,18 +717,18 @@ foreign_t swi_fann_train_epoch ( term_t ann_pt, term_t data_pt ) {
 }
 
 
-foreign_t swi_fann_test_data  ( term_t ann_pt, term_t data_pt, term_t MSE_pt ) { 
+foreign_t swi_fann_test_data  ( term_t ann_pt, term_t data_pt, term_t MSE_pt ) {
 
 	void *ann, *data;
 
-	if ( !PL_get_pointer ( ann_pt, &ann ) || 
+	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_pointer ( data_pt, &data ) ) PL_fail;
 
 	return PL_unify_float ( MSE_pt, fann_test_data ( ann, data ) );
 }
 
 
-foreign_t swi_fann_read_train_from_file ( term_t file_pt, term_t data_pt ) { 
+foreign_t swi_fann_read_train_from_file ( term_t file_pt, term_t data_pt ) {
 
 	char *file;
 
@@ -743,8 +743,8 @@ foreign_t swi_fann_create_train ( term_t ann_pt, term_t num_data_pt, term_t num_
 
 	unsigned int num_data, num_input, num_output;
 
-	if ( !PL_get_integer ( num_data_pt, &num_data ) || 
-		 !PL_get_integer ( num_input_pt, &num_input ) ||	
+	if ( !PL_get_integer ( num_data_pt, &num_data ) ||
+		 !PL_get_integer ( num_input_pt, &num_input ) ||
          !PL_get_integer ( num_output_pt, &num_output ) ) PL_fail;
 
     return PL_unify_pointer ( ann_pt, fann_create_train ( num_data, num_input, num_output ) );
@@ -753,7 +753,7 @@ foreign_t swi_fann_create_train ( term_t ann_pt, term_t num_data_pt, term_t num_
 
 
 /* Not Finished: doesn't seem to make much sense from Prolog, advise me if you see any use for it
-   
+
    swi_fann_create_train_from_callback
 */
 
@@ -783,10 +783,10 @@ foreign_t swi_fann_shuffle_train_data ( term_t td_pt ) {
 
 
 foreign_t swi_fann_scale_train ( term_t ann_pt, term_t data_pt ) {
-															
+
 	void *ann, *data;
 
-	if ( !PL_get_pointer ( ann_pt, &ann ) || 
+	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_pointer ( data_pt, &data ) ) PL_fail;
 
 	fann_scale_train ( ann, data );
@@ -796,10 +796,10 @@ foreign_t swi_fann_scale_train ( term_t ann_pt, term_t data_pt ) {
 
 
 foreign_t swi_fann_descale_train ( term_t ann_pt, term_t data_pt ) {
-															
+
 	void *ann, *data;
 
-	if ( !PL_get_pointer ( ann_pt, &ann ) || 
+	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_pointer ( data_pt, &data ) ) PL_fail;
 
 	fann_descale_train ( ann, data );
@@ -809,11 +809,11 @@ foreign_t swi_fann_descale_train ( term_t ann_pt, term_t data_pt ) {
 
 
 foreign_t swi_fann_set_input_scaling_params ( term_t ann_pt, term_t data_pt, term_t new_input_min_pt, term_t new_input_max_pt ) {
-															
+
 	void *ann, *data;
 	double new_input_min, new_input_max;
 
-	if ( !PL_get_pointer ( ann_pt, &ann ) || 
+	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_pointer ( data_pt, &data ) ||
 		 !PL_get_float ( new_input_min_pt, &new_input_min ) ||
 		 !PL_get_float ( new_input_max_pt, &new_input_max ) ) PL_fail;
@@ -823,11 +823,11 @@ foreign_t swi_fann_set_input_scaling_params ( term_t ann_pt, term_t data_pt, ter
 
 
 foreign_t swi_fann_set_output_scaling_params ( term_t ann_pt, term_t data_pt, term_t new_output_min_pt, term_t new_output_max_pt ) {
-															
+
 	void *ann, *data;
 	double new_output_min, new_output_max;
 
-	if ( !PL_get_pointer ( ann_pt, &ann ) || 
+	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_pointer ( data_pt, &data ) ||
 		 !PL_get_float ( new_output_min_pt, &new_output_min ) ||
 		 !PL_get_float ( new_output_max_pt, &new_output_max ) ) PL_fail;
@@ -837,11 +837,11 @@ foreign_t swi_fann_set_output_scaling_params ( term_t ann_pt, term_t data_pt, te
 
 
 foreign_t swi_fann_set_scaling_params ( term_t ann_pt, term_t data_pt, term_t new_input_min_pt, term_t new_input_max_pt, term_t new_output_min_pt, term_t new_output_max_pt ) {
-															
+
 	void *ann, *data;
 	double new_input_min, new_input_max, new_output_min, new_output_max;
 
-	if ( !PL_get_pointer ( ann_pt, &ann ) || 
+	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_pointer ( data_pt, &data ) ||
 		 !PL_get_float ( new_input_min_pt, &new_input_min ) ||
 		 !PL_get_float ( new_input_max_pt, &new_input_max ) ||
@@ -878,7 +878,7 @@ foreign_t swi_fann_scale_input ( term_t ann_pt, term_t input_pt ) {
 
 	for ( i = 0; i < num_input; i++ ) {
 
-		if ( !PL_unify_list ( input_pt, temp_pt, input_pt ) || 
+		if ( !PL_unify_list ( input_pt, temp_pt, input_pt ) ||
 			 !PL_FANN_GET_FANNTYPE(temp_pt,input+i) ) PL_fail;
 	}
 	PL_unify_nil ( input_pt );
@@ -905,7 +905,7 @@ foreign_t swi_fann_scale_output ( term_t ann_pt, term_t output_pt ) {
 
 	for ( i = 0; i < num_output; i++ ) {
 
-		if ( !PL_unify_list ( output_pt, temp_pt, output_pt ) || 
+		if ( !PL_unify_list ( output_pt, temp_pt, output_pt ) ||
 			 !PL_FANN_GET_FANNTYPE(temp_pt,output+i) ) PL_fail;
 	}
 	PL_unify_nil ( output_pt );
@@ -932,7 +932,7 @@ foreign_t swi_fann_descale_input ( term_t ann_pt, term_t input_pt ) {
 
 	for ( i = 0; i < num_input; i++ ) {
 
-		if ( !PL_unify_list ( input_pt, temp_pt, input_pt ) || 
+		if ( !PL_unify_list ( input_pt, temp_pt, input_pt ) ||
 			 !PL_FANN_GET_FANNTYPE(temp_pt,input+i) ) PL_fail;
 	}
 	PL_unify_nil ( input_pt );
@@ -959,7 +959,7 @@ foreign_t swi_fann_descale_output ( term_t ann_pt, term_t output_pt ) {
 
 	for ( i = 0; i < num_output; i++ ) {
 
-		if ( !PL_unify_list ( output_pt, temp_pt, output_pt ) || 
+		if ( !PL_unify_list ( output_pt, temp_pt, output_pt ) ||
 			 !PL_FANN_GET_FANNTYPE(temp_pt,output+i) ) PL_fail;
 	}
 	PL_unify_nil ( output_pt );
@@ -1081,25 +1081,25 @@ foreign_t swi_fann_num_output_train_data ( term_t data_pt, term_t len_pt ) {
 }
 
 
-foreign_t swi_fann_save_train ( term_t data_pt, term_t file_pt ) { 	
+foreign_t swi_fann_save_train ( term_t data_pt, term_t file_pt ) {
 
 	void *data;
 	char *file;
 
-	if ( !PL_get_pointer ( data_pt, &data ) || 
+	if ( !PL_get_pointer ( data_pt, &data ) ||
 		 !PL_get_file_name ( file_pt, &file, PL_FILE_ABSOLUTE ) ) PL_fail;
 
 	if ( !fann_save_train ( data, file ) ) PL_succeed; else PL_fail;
 }
 
 
-foreign_t swi_fann_save_train_to_fixed ( term_t data_pt, term_t file_pt, term_t dec_pt ) { 	
+foreign_t swi_fann_save_train_to_fixed ( term_t data_pt, term_t file_pt, term_t dec_pt ) {
 
 	void *data;
 	char *file;
 	unsigned int dec;
 
-	if ( !PL_get_pointer ( data_pt, &data ) || 
+	if ( !PL_get_pointer ( data_pt, &data ) ||
 		 !PL_get_file_name ( file_pt, &file, PL_FILE_ABSOLUTE ) ||
 		 !PL_get_integer ( dec_pt, &dec ) ) PL_fail;
 
@@ -1108,11 +1108,11 @@ foreign_t swi_fann_save_train_to_fixed ( term_t data_pt, term_t file_pt, term_t 
 
 
 foreign_t swi_fann_get_training_algorithm ( term_t ann_pt, term_t type_pt ) {
-	
+
 	void *ann;
 
 	if ( !PL_get_pointer ( ann_pt, &ann ) ) PL_fail;
-		
+
     return PL_unify_atom_chars ( type_pt, FANN_TRAIN_NAMES[ fann_get_training_algorithm ( ann ) ] );
 }
 
@@ -1151,7 +1151,7 @@ foreign_t swi_fann_set_learning_rate ( term_t ann_pt, term_t in_pt ) {
 
 	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_float ( in_pt, &in ) ) PL_fail;
-	
+
 	fann_set_learning_rate ( ann, (float) in );
 
 	PL_succeed;
@@ -1175,7 +1175,7 @@ foreign_t swi_fann_set_learning_momentum ( term_t ann_pt, term_t in_pt ) {
 
 	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_float ( in_pt, &in ) ) PL_fail;
-	
+
 	fann_set_learning_momentum ( ann, (float) in );
 
 	PL_succeed;
@@ -1183,15 +1183,15 @@ foreign_t swi_fann_set_learning_momentum ( term_t ann_pt, term_t in_pt ) {
 
 
 foreign_t swi_fann_get_activation_function ( term_t ann_pt, term_t layer_pt, term_t neuron_pt, term_t type_pt ) {
-	
+
 	unsigned int layer, neuron;
 	void *ann;
 
 	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_integer ( layer_pt, &layer ) ||
 		 !PL_get_integer ( neuron_pt, &neuron ) ) PL_fail;
-	
-	return PL_unify_atom_chars ( type_pt, FANN_ACTIVATIONFUNC_NAMES[ fann_get_activation_function ( ann, layer, neuron ) ] );	
+
+	return PL_unify_atom_chars ( type_pt, FANN_ACTIVATIONFUNC_NAMES[ fann_get_activation_function ( ann, layer, neuron ) ] );
 }
 
 
@@ -1207,7 +1207,7 @@ foreign_t swi_fann_set_activation_function ( term_t ann_pt, term_t type_pt, term
 		 !PL_get_integer ( neuron_pt, &neuron ) ) PL_fail;
 
 	fann_set_activation_function ( ann, lookup_activationfunc_enum ( type ), layer, neuron );
-	
+
 	PL_succeed;
 }
 
@@ -1279,7 +1279,7 @@ foreign_t swi_fann_set_activation_steepness ( term_t ann_pt, term_t steepness_pt
 		 !PL_FANN_GET_FANNTYPE(steepness_pt,&steepness) ||
 		 !PL_get_integer ( layer_pt, &layer ) ||
 		 !PL_get_integer ( neuron_pt, &neuron ) ) PL_fail;
-	
+
 	fann_set_activation_steepness ( ann, steepness, layer, neuron );
 
 	PL_succeed;
@@ -1333,11 +1333,11 @@ foreign_t swi_fann_set_activation_steepness_output ( term_t ann_pt, term_t steep
 
 
 foreign_t swi_fann_get_train_error_function ( term_t ann_pt, term_t type_pt ) {
-	
+
 	void *ann;
 
 	if ( !PL_get_pointer ( ann_pt, &ann ) ) PL_fail;
-	
+
 	return PL_unify_atom_chars ( type_pt, FANN_ERRORFUNC_NAMES[ fann_get_train_error_function ( ann ) ] );
 }
 
@@ -1358,12 +1358,12 @@ foreign_t swi_fann_set_train_error_function ( term_t ann_pt, term_t type_pt ) {
 
 
 foreign_t swi_fann_get_train_stop_function ( term_t ann_pt, term_t type_pt ) {
-	
+
 	void *ann;
 
 	if ( !PL_get_pointer ( ann_pt, &ann ) ) PL_fail;
-	
-	return PL_unify_atom_chars ( type_pt, FANN_STOPFUNC_NAMES[ fann_get_train_stop_function ( ann ) ] );	
+
+	return PL_unify_atom_chars ( type_pt, FANN_STOPFUNC_NAMES[ fann_get_train_stop_function ( ann ) ] );
 }
 
 
@@ -1383,11 +1383,11 @@ foreign_t swi_fann_set_train_stop_function ( term_t ann_pt, term_t type_pt ) {
 
 
 foreign_t swi_fann_get_bit_fail_limit ( term_t ann_pt, term_t bit_fail_limit_pt ) {
-	
+
 	void *ann;
 
 	if ( !PL_get_pointer ( ann_pt, &ann ) ) PL_fail;
-	
+
 	return PL_FANN_UNIFY_FANNTYPE(bit_fail_limit_pt,fann_get_bit_fail_limit(ann));
 }
 
@@ -1429,7 +1429,7 @@ foreign_t swi_fann_set_quickprop_decay ( term_t ann_pt, term_t in_pt ) {
 
 	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_float ( in_pt, &in ) ) PL_fail;
-	
+
 	fann_set_quickprop_decay ( ann, (float) in );
 
 	PL_succeed;
@@ -1453,7 +1453,7 @@ foreign_t swi_fann_set_quickprop_mu ( term_t ann_pt, term_t in_pt ) {
 
 	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_float ( in_pt, &in ) ) PL_fail;
-	
+
 	fann_set_quickprop_mu ( ann, (float) in );
 
 	PL_succeed;
@@ -1477,7 +1477,7 @@ foreign_t swi_fann_set_rprop_increase_factor ( term_t ann_pt, term_t in_pt ) {
 
 	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_float ( in_pt, &in ) ) PL_fail;
-	
+
 	fann_set_rprop_increase_factor ( ann, (float) in );
 
 	PL_succeed;
@@ -1501,7 +1501,7 @@ foreign_t swi_fann_set_rprop_decrease_factor ( term_t ann_pt, term_t in_pt ) {
 
 	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_float ( in_pt, &in ) ) PL_fail;
-	
+
 	fann_set_rprop_decrease_factor ( ann, (float) in );
 
 	PL_succeed;
@@ -1525,7 +1525,7 @@ foreign_t swi_fann_set_rprop_delta_min ( term_t ann_pt, term_t in_pt ) {
 
 	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_float ( in_pt, &in ) ) PL_fail;
-	
+
 	fann_set_rprop_delta_min ( ann, (float) in );
 
 	PL_succeed;
@@ -1549,7 +1549,7 @@ foreign_t swi_fann_set_rprop_delta_max ( term_t ann_pt, term_t in_pt ) {
 
 	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_float ( in_pt, &in ) ) PL_fail;
-	
+
 	fann_set_rprop_delta_max ( ann, (float) in );
 
 	PL_succeed;
@@ -1573,7 +1573,7 @@ foreign_t swi_fann_set_rprop_delta_zero ( term_t ann_pt, term_t in_pt ) {
 
 	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_float ( in_pt, &in ) ) PL_fail;
-	
+
 	fann_set_rprop_delta_zero ( ann, (float) in );
 
 	PL_succeed;
@@ -1597,7 +1597,7 @@ foreign_t swi_fann_set_sarprop_weight_decay_shift ( term_t ann_pt, term_t in_pt 
 
 	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_float ( in_pt, &in ) ) PL_fail;
-	
+
 	fann_set_sarprop_weight_decay_shift ( ann, (float) in );
 
 	PL_succeed;
@@ -1621,7 +1621,7 @@ foreign_t swi_fann_set_sarprop_step_error_threshold_factor ( term_t ann_pt, term
 
 	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_float ( in_pt, &in ) ) PL_fail;
-	
+
 	fann_set_sarprop_step_error_threshold_factor ( ann, (float) in );
 
 	PL_succeed;
@@ -1645,7 +1645,7 @@ foreign_t swi_fann_set_sarprop_step_error_shift ( term_t ann_pt, term_t in_pt ) 
 
 	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_float ( in_pt, &in ) ) PL_fail;
-	
+
 	fann_set_sarprop_step_error_shift ( ann, (float) in );
 
 	PL_succeed;
@@ -1669,7 +1669,7 @@ foreign_t swi_fann_set_sarprop_temperature ( term_t ann_pt, term_t in_pt ) {
 
 	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_float ( in_pt, &in ) ) PL_fail;
-	
+
 	fann_set_sarprop_temperature ( ann, (float) in );
 
 	PL_succeed;
@@ -1683,12 +1683,12 @@ foreign_t swi_fann_cascadetrain_on_data ( term_t ann_pt, term_t data_pt, term_t 
 	unsigned int max_neurons, neurons_between_reports;
 	double desired_error;
 
-	if ( !PL_get_pointer ( ann_pt, &ann ) || 
+	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_pointer ( data_pt, &data ) ||
-		 !PL_get_integer ( max_neurons_pt, &max_neurons ) ||	
-         !PL_get_integer ( neurons_between_reports_pt, &neurons_between_reports ) || 
+		 !PL_get_integer ( max_neurons_pt, &max_neurons ) ||
+         !PL_get_integer ( neurons_between_reports_pt, &neurons_between_reports ) ||
 		 !PL_get_float ( desired_error_pt, &desired_error ) ) PL_fail;
-	
+
 	fann_cascadetrain_on_data ( ann, data, max_neurons, neurons_between_reports, (float) desired_error );
 
 	PL_succeed;
@@ -1702,10 +1702,10 @@ foreign_t swi_fann_cascadetrain_on_file ( term_t ann_pt, term_t file_pt, term_t 
 	unsigned int max_neurons, neurons_between_reports;
 	double desired_error;
 
-	if ( !PL_get_pointer ( ann_pt, &ann ) || 
+	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_file_name ( file_pt, &file, PL_FILE_ABSOLUTE ) ||
-		 !PL_get_integer ( max_neurons_pt, &max_neurons ) ||	
-         !PL_get_integer ( neurons_between_reports_pt, &neurons_between_reports ) || 
+		 !PL_get_integer ( max_neurons_pt, &max_neurons ) ||
+         !PL_get_integer ( neurons_between_reports_pt, &neurons_between_reports ) ||
 		 !PL_get_float ( desired_error_pt, &desired_error ) ) PL_fail;
 
    fann_cascadetrain_on_file ( ann, file, max_neurons, neurons_between_reports, (float) desired_error );
@@ -1731,7 +1731,7 @@ foreign_t swi_fann_set_cascade_output_change_fraction ( term_t ann_pt, term_t in
 
 	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_float ( in_pt, &in ) ) PL_fail;
-	
+
 	fann_set_cascade_output_change_fraction ( ann, (float) in );
 
 	PL_succeed;
@@ -1755,7 +1755,7 @@ foreign_t swi_fann_set_cascade_output_stagnation_epochs ( term_t ann_pt, term_t 
 
 	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_integer ( in_pt, &in ) ) PL_fail;
-	
+
 	fann_set_cascade_output_stagnation_epochs ( ann, in );
 
 	PL_succeed;
@@ -1779,7 +1779,7 @@ foreign_t swi_fann_set_cascade_candidate_change_fraction ( term_t ann_pt, term_t
 
 	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_float ( in_pt, &in ) ) PL_fail;
-	
+
 	fann_set_cascade_candidate_change_fraction ( ann, (float) in );
 
 	PL_succeed;
@@ -1803,7 +1803,7 @@ foreign_t swi_fann_set_cascade_candidate_stagnation_epochs ( term_t ann_pt, term
 
 	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_integer ( in_pt, &in ) ) PL_fail;
-	
+
 	fann_set_cascade_candidate_stagnation_epochs ( ann, in );
 
 	PL_succeed;
@@ -1827,7 +1827,7 @@ foreign_t swi_fann_set_cascade_weight_multiplier ( term_t ann_pt, term_t in_pt )
 
 	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_FANN_GET_FANNTYPE(in_pt,&in) ) PL_fail;
-	
+
 	fann_set_cascade_weight_multiplier ( ann, in );
 
 	PL_succeed;
@@ -1851,7 +1851,7 @@ foreign_t swi_fann_set_cascade_candidate_limit ( term_t ann_pt, term_t in_pt ) {
 
 	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_FANN_GET_FANNTYPE(in_pt,&in) ) PL_fail;
-	
+
 	fann_set_cascade_candidate_limit ( ann, in );
 
 	PL_succeed;
@@ -1875,7 +1875,7 @@ foreign_t swi_fann_set_cascade_max_out_epochs ( term_t ann_pt, term_t in_pt ) {
 
 	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_integer ( in_pt, &in ) ) PL_fail;
-	
+
 	fann_set_cascade_max_out_epochs ( ann, in );
 
 	PL_succeed;
@@ -1899,7 +1899,7 @@ foreign_t swi_fann_set_cascade_min_out_epochs ( term_t ann_pt, term_t in_pt ) {
 
 	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_integer ( in_pt, &in ) ) PL_fail;
-	
+
 	fann_set_cascade_min_out_epochs ( ann, in );
 
 	PL_succeed;
@@ -1923,7 +1923,7 @@ foreign_t swi_fann_set_cascade_max_cand_epochs ( term_t ann_pt, term_t in_pt ) {
 
 	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_integer ( in_pt, &in ) ) PL_fail;
-	
+
 	fann_set_cascade_max_cand_epochs ( ann, in );
 
 	PL_succeed;
@@ -1947,7 +1947,7 @@ foreign_t swi_fann_set_cascade_min_cand_epochs ( term_t ann_pt, term_t in_pt ) {
 
 	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_integer ( in_pt, &in ) ) PL_fail;
-	
+
 	fann_set_cascade_min_cand_epochs ( ann, in );
 
 	PL_succeed;
@@ -1976,14 +1976,14 @@ foreign_t swi_fann_get_cascade_activation_functions_count ( term_t ann_pt, term_
 
 
 foreign_t swi_fann_get_cascade_activation_functions ( term_t ann_pt, term_t type_pt ) {
-	
+
 	unsigned int i;
 	void *ann;
 	enum fann_activationfunc_enum *functions;
 	term_t temp_pt = PL_new_term_ref ();
 
 	if ( !PL_get_pointer ( ann_pt, &ann ) ) PL_fail;
-	
+
 	functions = fann_get_cascade_activation_functions ( ann );
 
 	for ( i = 0; i < fann_get_cascade_activation_functions_count ( ann ); i++ ) {
@@ -2031,21 +2031,21 @@ foreign_t swi_fann_get_cascade_activation_steepnesses_count ( term_t ann_pt, ter
 
 
 foreign_t swi_fann_get_cascade_activation_steepnesses ( term_t ann_pt, term_t type_pt ) {
-	
+
 	unsigned int i;
 	term_t temp_pt = PL_new_term_ref ();
 	fann_type *type_list;
 	void *ann;
 
 	if ( !PL_get_pointer ( ann_pt, &ann ) ) PL_fail;
-	
+
 	type_list = fann_get_cascade_activation_steepnesses ( ann );
 
 	for ( i = 0; i < fann_get_cascade_activation_steepnesses_count ( ann ); i++ ) {
-		
+
 		if ( !PL_unify_list ( type_pt, temp_pt, type_pt ) ||
 			 !PL_FANN_UNIFY_FANNTYPE(temp_pt,type_list[i]) ) PL_fail;
-		
+
 	}
 	PL_unify_nil ( type_pt );
 
@@ -2068,7 +2068,7 @@ foreign_t swi_fann_set_cascade_activation_steepnesses ( term_t ann_pt, term_t ty
 
 		if ( !PL_get_list ( type_list_pt, temp_pt, type_list_pt ) ||
 			 !PL_FANN_GET_FANNTYPE(temp_pt,&temp) ) PL_fail;
-	 	
+
 		type_list[i++] = temp;
 		}
 
@@ -2095,15 +2095,15 @@ foreign_t swi_fann_set_cascade_num_candidate_groups ( term_t ann_pt, term_t in_p
 
 	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_integer ( in_pt, &in ) ) PL_fail;
-	
+
 	fann_set_cascade_num_candidate_groups ( ann, in );
 
 	PL_succeed;
 }
 
 
-foreign_t swi_fann_create_from_file ( term_t file_pt, term_t ann_pt ) {   
-	
+foreign_t swi_fann_create_from_file ( term_t file_pt, term_t ann_pt ) {
+
 	char *file;
 
     if ( !PL_get_file_name ( file_pt, &file, PL_FILE_ABSOLUTE || PL_FILE_SEARCH || PL_FILE_EXIST ) ) PL_fail;
@@ -2112,7 +2112,7 @@ foreign_t swi_fann_create_from_file ( term_t file_pt, term_t ann_pt ) {
 }
 
 
-foreign_t swi_fann_save ( term_t ann_pt, term_t file_pt ) { 	
+foreign_t swi_fann_save ( term_t ann_pt, term_t file_pt ) {
 
 	void *ann;
 	char *file;
@@ -2124,39 +2124,39 @@ foreign_t swi_fann_save ( term_t ann_pt, term_t file_pt ) {
 }
 
 
-foreign_t swi_fann_save_to_fixed ( term_t ann_pt, term_t file_pt ) { 	
+foreign_t swi_fann_save_to_fixed ( term_t ann_pt, term_t file_pt ) {
 
 	void *ann;
 	char *file;
 
-	if ( !PL_get_pointer ( ann_pt, &ann ) || 
+	if ( !PL_get_pointer ( ann_pt, &ann ) ||
 		 !PL_get_file_name ( file_pt, &file, PL_FILE_ABSOLUTE ) ) PL_fail;
 
 	if ( !fann_save_to_fixed ( ann, file ) ) PL_succeed; else PL_fail;
 }
 
 
-foreign_t swi_fann_set_error_log ( term_t error_data_pt, term_t file_pt ) { 	
+foreign_t swi_fann_set_error_log ( term_t error_data_pt, term_t file_pt ) {
 
 	void *error_data;
 	char *file, *null;
 
-    
-	if ( PL_get_chars ( file_pt, &null, CVT_ATOM ) && !strcmp ( "NULL", null ) ) {  
-		
+
+	if ( PL_get_chars ( file_pt, &null, CVT_ATOM ) && !strcmp ( "NULL", null ) ) {
+
 		PL_get_pointer ( error_data_pt, &error_data );
-		fann_set_error_log ( error_data, NULL ); 
-		PL_succeed; 
+		fann_set_error_log ( error_data, NULL );
+		PL_succeed;
 	}
 
 	if ( PL_get_chars ( error_data_pt, &null, CVT_ATOM ) && !strcmp ( "NULL", null ) ) {
 
 		PL_get_file_name ( file_pt, &file, PL_FILE_ABSOLUTE );
-		fann_set_error_log ( NULL, ( FILE * ) file ); 
-		PL_succeed; 
+		fann_set_error_log ( NULL, ( FILE * ) file );
+		PL_succeed;
 	}
 
-	if ( !PL_get_pointer ( error_data_pt, &error_data ) || 
+	if ( !PL_get_pointer ( error_data_pt, &error_data ) ||
 		 !PL_get_file_name ( file_pt, &file, PL_FILE_ABSOLUTE ) ) PL_fail;
 
 	fann_set_error_log ( error_data, ( FILE * ) file );
@@ -2165,7 +2165,7 @@ foreign_t swi_fann_set_error_log ( term_t error_data_pt, term_t file_pt ) {
 }
 
 
-foreign_t swi_fann_get_errno ( term_t error_data_pt, term_t last_error_pt ) { 	
+foreign_t swi_fann_get_errno ( term_t error_data_pt, term_t last_error_pt ) {
 
 	void *error_data;
 	char *log_file;
@@ -2176,7 +2176,7 @@ foreign_t swi_fann_get_errno ( term_t error_data_pt, term_t last_error_pt ) {
 }
 
 
-foreign_t swi_fann_reset_errno ( term_t error_data_pt ) { 	
+foreign_t swi_fann_reset_errno ( term_t error_data_pt ) {
 
 	void *error_data;
 
@@ -2188,7 +2188,7 @@ foreign_t swi_fann_reset_errno ( term_t error_data_pt ) {
 }
 
 
-foreign_t swi_fann_reset_errstr ( term_t error_data_pt ) { 	
+foreign_t swi_fann_reset_errstr ( term_t error_data_pt ) {
 
 	void *error_data;
 
@@ -2200,7 +2200,7 @@ foreign_t swi_fann_reset_errstr ( term_t error_data_pt ) {
 }
 
 
-foreign_t swi_fann_get_errstr ( term_t error_data_pt, term_t last_error_pt ) { 	
+foreign_t swi_fann_get_errstr ( term_t error_data_pt, term_t last_error_pt ) {
 
 	void *error_data;
 	char *log_file;
@@ -2211,7 +2211,7 @@ foreign_t swi_fann_get_errstr ( term_t error_data_pt, term_t last_error_pt ) {
 }
 
 
-foreign_t swi_fann_print_error ( term_t error_data_pt ) { 	
+foreign_t swi_fann_print_error ( term_t error_data_pt ) {
 
 	void *error_data;
 
@@ -2403,7 +2403,7 @@ install_t install() {
 
 	PL_register_foreign ( "fann_create_from_file", 2, swi_fann_create_from_file, 0); // Constructs a backpropagation neural network from a configuration file, which have been saved by fann_save.
 	PL_register_foreign ( "fann_save", 2, swi_fann_save, 0); // Save the entire network to a configuration file.
-	PL_register_foreign ( "fann_save_to_fixed", 2, swi_fann_save_to_fixed, 0); // Saves the entire network to a configuration file. 
+	PL_register_foreign ( "fann_save_to_fixed", 2, swi_fann_save_to_fixed, 0); // Saves the entire network to a configuration file.
 
 	// Error Handling (6)
 
@@ -2412,5 +2412,5 @@ install_t install() {
 	PL_register_foreign ( "fann_reset_errno", 1, swi_fann_reset_errno, 0); // Resets the last error number.
 	PL_register_foreign ( "fann_reset_errstr", 1, swi_fann_reset_errstr, 0); // Resets the last error string.
     PL_register_foreign ( "fann_get_errstr", 2, swi_fann_get_errstr, 0); // Returns the last errstr.
-	PL_register_foreign ( "fann_print_error", 1, swi_fann_print_error, 0); // Prints the last error to stderr. 
+	PL_register_foreign ( "fann_print_error", 1, swi_fann_print_error, 0); // Prints the last error to stderr.
 }

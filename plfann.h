@@ -40,7 +40,6 @@ applet Configuration Manager and select Advanced and Environment Variables). */
 
 #ifdef FANN_FLOAT
 #include <floatfann.h>
-__forceinline int PL_get_float32 ( term_t in, float* out );
 #define PL_FANN_GET_FANNTYPE(X,Y) PL_get_float32(X,Y)
 #define PL_FANN_UNIFY_FANNTYPE(X,Y) PL_unify_float(X,Y)
 #elif FANN_DOUBLE
