@@ -1,0 +1,34 @@
+
+The  enclosed files,  plfann.h,  plfann.c  and  plfann.pl  form  the  SWI-Prolog
+bindings to  the Fast Artificial  Neural Network library. fann is an open source 
+ANN-library and is released under the LGPL. The version of the library for which
+these bindings are intended to be used with is version 2.1.0. Functions foreseen
+in version 2.2.0 are equally included, but have been commented out.
+
+On the  fann home page, links  are provided to  the Source  Code, the  Reference 
+Manual and additionally, more general, materials related to ANN's.
+
+fann home page: http://leenissen.dk/fann/
+
+All available functions are implemented, with the exception of:
+
+     1. fann_create_train_from_callback
+     2. fann_set_callback
+     
+The  predicate names, used in  this library,  are the  same as the  ones in  the 
+reference manual. C-Function return arguments  are added  as an additional  (and
+last) argument  to the  predicates concerned.  In a small  number of  functions, 
+having length values, like  f.e. the length of  an input array, these  arguments
+have been removed, as these can be obtained in the prolog interface at relative-
+ly low cost.
+
+
+dated: 18.11.2009
+
+
+
+
+
+
+
+                          degski [ta] gmail [tod] com
