@@ -252,8 +252,6 @@ foreign_t swi_fann_run ( term_t ann_pt, term_t input_pt, term_t output_pt ) {
 		     !PL_FANN_UNIFY_FANNTYPE(temp_pt,output[i]) ) PL_fail;
 	}
 
-	free ( output );
-
 	return PL_unify_nil ( output_pt );
 }
 
