@@ -1,12 +1,17 @@
-    
+
 :- module( plfann, [
-        
-        
-        % When using version 2.2.0, uncomment the 
+
+        % When using version 2.2.0, uncomment the
         % functions in the interface definition
-        
-        % Creation, Destruction & Execution (12)
-        
+
+        % Specific to plfann (3)
+
+        fann_type/1,
+        fann_error/1,
+        fann_print_mode/1,
+
+        % Creation, Destruction & Execution (24[25])
+
         fann_create_standard/4,
         fann_create_standard/5,
         fann_create_standard/6,
@@ -28,12 +33,13 @@
         fann_destroy/1,
         % fann_copy/2,
         fann_run/3,
+        fann_run_unsafe/3,
         fann_randomize_weights/3,
         fann_init_weights/2,
         fann_print_connections/1,
-        
+
         % Parameters (16)
-        
+
         fann_print_parameters/1,
         fann_get_num_input/2,
         fann_get_num_output/2,
@@ -49,26 +55,26 @@
         fann_set_weight/4,
         fann_set_user_data/2,
         fann_get_user_data/2,
-        % fann_get_decimal_point/2,
-        % fann_get_multiplier/2,
-        
+        fann_get_decimal_point/2,
+        fann_get_multiplier/2,
+
         % Training (5)
-        
+
         fann_train/3,
         fann_test/3,
         fann_get_MSE/2,
         fann_get_bit_fail/2,
         fann_reset_MSE/1,
-        
+
         % Training Data Training (4)
-        
+
         fann_train_on_data/5,
         fann_train_on_file/5,
         fann_train_epoch/2,
         fann_test_data/3,
-        
-        % Training Data Manipulation (25)
-        
+
+        % Training Data Manipulation (24[26])
+
         fann_read_train_from_file/2,
         % fann_create_train/4,
         % fann_create_train_from_callback/na,
@@ -95,9 +101,9 @@
         fann_num_output_train_data/2,
         fann_save_train/2,
         fann_save_train_to_fixed/3,
-        
-        % Parameters (44)
-        
+
+        % Parameters (36[45])
+
         fann_get_training_algorithm/2,
         fann_set_training_algorithm/2,
         fann_get_learning_rate/2,
@@ -143,14 +149,14 @@
         % fann_set_sarprop_step_error_shift/2,
         % fann_get_sarprop_temperature/2,
         % fann_set_sarprop_temperature/2,
-        
+
         %  Cascade Training (2)
-        
+
         fann_cascadetrain_on_data/5,
         fann_cascadetrain_on_file/5,
-        
-        % Parameters (28)
-        
+
+        % Parameters (25[29])
+
         fann_get_cascade_output_change_fraction/2,
         fann_set_cascade_output_change_fraction/2,
         fann_get_cascade_output_stagnation_epochs/2,
@@ -167,8 +173,8 @@
         fann_set_cascade_max_out_epochs/2,
         % fann_get_cascade_min_out_epochs/2,
         % fann_set_cascade_min_out_epochs/2,
-        % fann_get_cascade_max_cand_epochs/2,
-        % fann_set_cascade_max_cand_epochs/2,
+        fann_get_cascade_max_cand_epochs/2,
+        fann_set_cascade_max_cand_epochs/2,
         % fann_get_cascade_min_cand_epochs/2,
         % fann_set_cascade_min_cand_epochs/2,
         fann_get_cascade_num_candidates/2,
@@ -180,79 +186,137 @@
         fann_set_cascade_activation_steepnesses/2,
         fann_get_cascade_num_candidate_groups/2,
         fann_set_cascade_num_candidate_groups/2,
-        
+
         % File Input and Output (3)
-        
+
         fann_create_from_file/2,
         fann_save/2,
         fann_save_to_fixed/2,
-       
-        % Error Handling (6)
-        
+
+        % Error Handling (8)
+
         fann_set_error_log/2,
         fann_get_errno/2,
         fann_reset_errno/1,
         fann_reset_errstr/1,
         fann_get_errstr/2,
-        fann_print_error/1
+        fann_print_error/0,
+        fann_print_error/1,
+        fann_print_error_core/1
 
     ]).
-    
 
-:-  load_foreign_library( foreign(plfann) ).
 
-% First argument is the no layers, but ignored
+:- load_foreign_library( foreign( plfann ) ).
+
+:- fann_print_mode( 'FANN_SWI' ).
+
+
+% Wrapper predicates defined in prolog.
+% -------------------------------------
+
+% First argument is the number of layers, but is ignored
+
 fann_create_standard(_, A, B, X) :-
-        fann_create_standard([ A, B], X), !.
+        fann_create_standard_array([ A, B], X), !.
 fann_create_standard(_, _, _, _) :- !, fail.
 fann_create_standard(_, A, B, C, X) :-
-        fann_create_standard([ A, B, C], X), !.
+        fann_create_standard_array([ A, B, C], X), !.
 fann_create_standard(_, _, _, _, _) :- !, fail.
 fann_create_standard(_, A, B, C, D, X) :-
-        fann_create_standard([ A, B, C, D], X), !.
+        fann_create_standard_array([ A, B, C, D], X), !.
 fann_create_standard(_, _, _, _, _, _) :- !, fail.
 fann_create_standard(_, A, B, C, D, E, X) :-
-        fann_create_standard([ A, B, C, D, E], X), !.
+        fann_create_standard_array([ A, B, C, D, E], X), !.
 fann_create_standard(_, _, _, _, _, _, _) :- !, fail.
+
+
+% First argument is the number of layers, but is ignored
 
 fann_create_standard_array(_, X, Y) :-
         fann_create_standard_array(X, Y), !.
 fann_create_standard_array(_, _, _) :- !, fail.
 
 
-% Second argument is the no layers, but ignored
+% First argument is the number of layers, but is ignored
+
 fann_create_sparse(Y, _, A, B, X) :-
-        fann_create_sparse(Y, [ A, B], X), !.
+        fann_create_sparse_array(Y, [ A, B], X), !.
 fann_create_sparse(_, _, _, _, _) :- !, fail.
 fann_create_sparse(Y, _, A, B, C, X) :-
-        fann_create_sparse(Y, [ A, B, C], X), !.
+        fann_create_sparse_array(Y, [ A, B, C], X), !.
 fann_create_sparse(_, _, _, _, _, _) :- !, fail.
 fann_create_sparse(Y, _, A, B, C, D, X) :-
-        fann_create_sparse(Y, [ A, B, C, D], X), !.
+        fann_create_sparse_array(Y, [ A, B, C, D], X), !.
 fann_create_sparse(_, _, _, _, _, _, _) :- !, fail.
 fann_create_sparse(Y, _, A, B, C, D, E, X) :-
-        fann_create_sparse(Y, [ A, B, C, D, E], X), !.
+        fann_create_sparse_array(Y, [ A, B, C, D, E], X), !.
 fann_create_sparse(_, _, _, _, _, _, _, _) :- !, fail.
+
+
+% First argument is the number of layers, but is ignored
 
 fann_create_sparse_array(X, _, Y, Z) :-
         fann_create_sparse_array(X, Y, Z), !.
 fann_create_shortcut_array(_, _, _, _) :- !, fail.
-        
 
-% First argument is the no layers, but ignored
+
+% First argument is the number of layers, but is ignored
+
 fann_create_shortcut(_, A, B, X) :-
-        fann_create_shortcut([ A, B], X), !.
+        fann_create_shortcut_array([ A, B], X), !.
 fann_create_shortcut(_, _, _, _) :- !, fail.
 fann_create_shortcut(_, A, B, C, X) :-
-        fann_create_shortcut([ A, B, C], X), !.
+        fann_create_shortcut_array([ A, B, C], X), !.
 fann_create_shortcut(_, _, _, _, _) :- !, fail.
 fann_create_shortcut(_, A, B, C, D, X) :-
-        fann_create_shortcut([ A, B, C, D], X), !.
+        fann_create_shortcut_array([ A, B, C, D], X), !.
 fann_create_shortcut(_, _, _, _, _, _) :- !, fail.
 fann_create_shortcut(_, A, B, C, D, E, X) :-
-        fann_create_shortcut([ A, B, C, D, E], X), !.
+        fann_create_shortcut_array([ A, B, C, D, E], X), !.
 fann_create_shortcut(_, _, _, _, _, _, _) :- !, fail.
+
+
+% First argument is the number of layers, but is ignored
 
 fann_create_shortcut_array(_, X, Y) :-
         fann_create_shortcut_array( X, Y), !.
 fann_create_shortcut_array(_, _, _) :- !, fail.
+
+
+% Error Printing through the SWI-Prolog Message system.
+% -----------------------------------------------------
+
+fann_print_error( ErrorData ) :-
+		fann_error( ErrorData ),
+		fann_get_errno( ErrorData, LastErrorNo ),
+		fann_get_errstr( ErrorData, LastErrorStr ),
+		ErrorMessage =.. [ error, LastErrorNo, LastErrorStr ],
+		print_message( plfann( ErrorMessage ) ), !.
+fann_print_error( _ ) :- !.
+
+fann_print_error :-
+        fann_print_error( 'NULL' ), !.
+
+
+% Messages.
+% ---------
+
+:- multifile
+	prolog:message/3.
+
+% print message (called directly from c).
+% ---------------------------------------
+
+prolog:message( plfann( print_message( Message ) ) ) -->
+        [ '~s'-[Message], flush ].
+
+prolog:message( plfann( print_message_at_same_line( Message ) ) ) -->
+        [ at_same_line, '~s'-[Message], flush ].
+
+
+% print errors.
+% -------------
+
+prolog:message( plfann( error( No, Str ) ) ) -->
+        [ 'FANN Error ~d: ~s'-[No, Str] ].
