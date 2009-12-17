@@ -83,21 +83,20 @@ FANN_EXTERNAL unsigned int FANN_API fann_swi_printf ( const char * format_string
 
 	unsigned int length, exit = EXIT_SUCCESS;
 	enum enum_fann_print_mode mode = fann_print_mode ( FANN_GET_MODE );
-	static enum line position = AT_START;
+	static enum line next_position = AT_START;
 	term_t message_pt, out_pt, type_pt;
 	static char buff[ sizeof ( char * ) << 10 ];
 	va_list elements;
 
 	va_start ( elements, format_string );
 
-	if ( mode == FANN_NATIVE ) {
+	if ( mode == FANN_NATIVE )
 
 		vprintf ( format_string, elements );
-	}
+
 	else {
 
-		*( buff ) = '\0';
-
+		buff[0] = '\0';
 		length = vsnprintf ( buff, sizeof ( buff ) - sizeof ( char * ),
 			                 format_string, elements );
 
@@ -111,41 +110,22 @@ FANN_EXTERNAL unsigned int FANN_API fann_swi_printf ( const char * format_string
 		type_pt = PL_new_term_ref ();
 		PL_put_string_chars ( message_pt, buff );
 
-		if ( length == 1 && buff[ 0 ] == '\n' ) {
+		if ( next_position == AT_START )
 
-			PL_cons_functor ( out_pt, PL_new_functor( PL_new_atom ( "print_nl" ), 0 ) );
-			position = AT_START;
-		}
+				PL_cons_functor ( out_pt, 
+					              PL_new_functor( PL_new_atom ( "print_message" ), 1 ), 
+								  message_pt );
+		else
+				PL_cons_functor ( out_pt, 
+					              PL_new_functor( PL_new_atom ( "print_message_at_same_line" ), 1 ), 
+								  message_pt );
 
-		else {
-
-			if ( buff[ length - 1 ] == '\n' ) {
-
-					PL_cons_functor ( out_pt,
-						              PL_new_functor( PL_new_atom ( "print_message" ), 1 ),
-									  message_pt );
-					position = AT_START;
-			}
-
-			else {
-
-				if ( position == AT_START ) {
-
-					PL_cons_functor ( out_pt,
-						              PL_new_functor( PL_new_atom ( "print_message" ), 1 ),
-									  message_pt );
-					position = NOT_AT_START;
-				}
-
-				else {
-
-					PL_cons_functor ( out_pt,
-						              PL_new_functor( PL_new_atom ( "print_message_at_same_line" ), 1 ),
-									  message_pt );
-				}
-			}
-		}
-
+		if ( buff[ length - 1 ] == '\n' )
+			
+			next_position = AT_START;
+		else
+			next_position = NOT_AT_START;
+			
 		PL_put_atom_chars ( type_pt, "informational" );
 		PL_cons_functor ( message_pt, PL_new_functor( PL_new_atom ( "plfann" ), 1 ), out_pt );
 		PL_cons_functor ( out_pt, PL_new_functor( PL_new_atom ( "print_message" ), 2 ), type_pt, message_pt );
@@ -158,5 +138,6 @@ FANN_EXTERNAL unsigned int FANN_API fann_swi_printf ( const char * format_string
 }
 
 #define printf fann_swi_printf
+
 
 #endif
