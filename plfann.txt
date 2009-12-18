@@ -60,9 +60,16 @@ Three additional functions/predicates have been added:
         mode, either 'FANN_SWI' or 'FANN_NATIVE'.
 
 
-In order for the above (3.) to work, the header-file fann_swi.h will need to  be
-included  in  fann.h, by  adding the line  '#include "fann_swi.h"'  (without the
-single quotes) after the other #include statements (around line 140).
+The idea of the  above is to ALSO be able  to build just one library (as opposed
+to fann and plfann) with  the SWI-Prolog bindings included  and still be able to
+use the same library both directly from C/C++ and SWI-Prolog.
+
+In order  for this to work, the header-file  fann_swi.h will need to be included
+in fann.h, by adding the line '#include "fann_swi.h"' (without the single quotes)
+after the other #include statements (around line 140).
+
+The macro BUILD_FANN_WITH_SWI will  need to be defined, when  building the  fann
+library.
 
 The header-file fann_swi.h will need to be copied/moved to the "../src/include/"
 directory of the source distribution, this is also where "fann.h" is located.
@@ -81,7 +88,7 @@ locale independancy", http://leenissen.dk/fann/forum/viewtopic.php?f=2&t=595 . A
 patch is posted.
 
 
-dated: 17.12.2009
+dated: 18.12.2009
 
 
 

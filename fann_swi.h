@@ -20,6 +20,10 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #ifndef __fann_swi_h__
 #define __fann_swi_h__
 
+FANN_EXTERNAL enum enum_fann_mode FANN_API fann_print_mode ( enum enum_fann_print_mode_switch value );
+
+#ifdef BUILD_FANN_WITH_SWI
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -79,7 +83,7 @@ FANN_EXTERNAL enum enum_fann_mode FANN_API fann_print_mode ( enum enum_fann_prin
 }
 
 
-FANN_EXTERNAL unsigned int FANN_API fann_swi_printf ( const char * format_string, ... ) {
+unsigned int FANN_API fann_swi_printf ( const char * format_string, ... ) {
 
 	unsigned int length, exit = EXIT_SUCCESS;
 	enum enum_fann_print_mode mode = fann_print_mode ( FANN_GET_MODE );
@@ -139,5 +143,6 @@ FANN_EXTERNAL unsigned int FANN_API fann_swi_printf ( const char * format_string
 
 #define printf fann_swi_printf
 
+#endif /* end BUILD_FANN_WITH_SWI */
 
 #endif
