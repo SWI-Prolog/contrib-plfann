@@ -209,7 +209,7 @@ foreign_t swi_fann_create_standard_array ( term_t layers_pt, term_t ann_pt ) {
 
 	while ( PL_get_list (layers_pt, layer_pt, layers_pt) ) {
 
-		PL_realloc ( l, ( nl + 1 ) * sizeof( unsigned int ) );
+		l = PL_realloc ( l, ( nl + 1 ) * sizeof( unsigned int ) );
 
 		if ( !PL_get_integer ( layer_pt, l+nl ) )
 		    return type_error ( layer_pt, "integer" );
@@ -257,7 +257,7 @@ foreign_t swi_fann_create_sparse_array ( term_t connection_rate_pt, term_t layer
 
 	while ( PL_get_list (layers_pt, layer_pt, layers_pt) ) {
 
-		PL_realloc ( l, ( nl + 1 ) * sizeof( unsigned int ) );
+		l = PL_realloc ( l, ( nl + 1 ) * sizeof( unsigned int ) );
 
 		if ( !PL_get_integer ( layer_pt, l+nl ) )
 	        return type_error ( layer_pt, "integer" );
@@ -301,7 +301,7 @@ foreign_t swi_fann_create_shortcut_array ( term_t layers_pt, term_t ann_pt ) {
 
 	while ( PL_get_list (layers_pt, layer_pt, layers_pt) ) {
 
-		PL_realloc ( l, ( nl + 1 ) * sizeof( unsigned int ) );
+		l = PL_realloc ( l, ( nl + 1 ) * sizeof( unsigned int ) );
 
 		if ( !PL_get_integer ( layer_pt, l+nl ) )
 	        return type_error ( layer_pt, "integer" );
