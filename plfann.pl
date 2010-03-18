@@ -292,7 +292,7 @@ fann_print_error( ErrorData ) :-
 		fann_get_errno( ErrorData, LastErrorNo ),
 		fann_get_errstr( ErrorData, LastErrorStr ),
 		ErrorMessage =.. [ error, LastErrorNo, LastErrorStr ],
-		print_message( plfann( ErrorMessage ) ), !.
+		print_message( error, plfann( ErrorMessage ) ), !.
 fann_print_error( _ ) :- !.
 
 fann_print_error :-
