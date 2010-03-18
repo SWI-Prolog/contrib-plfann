@@ -8,6 +8,7 @@
 
         fann_type/1,
         fann_error/1,
+        fann_swi_mode/0,
         fann_print_mode/1,
 
         % Creation, Destruction & Execution (24[25])
@@ -203,13 +204,18 @@
         fann_print_error/0,
         fann_print_error/1,
         fann_print_error_core/1
-
     ]).
 
 
-:- load_foreign_library( foreign( plfann ) ).
+%:- load_foreign_library( foreign( plfann ) ).
 
-:- fann_print_mode( 'FANN_SWI' ).
+:- use_foreign_library(plfann).
+
+
+fann_swi_mode :- fann_print_mode( 'FANN_SWI' ).
+
+% It do not work!!! Why?
+%:- fann_swi_mode.
 
 
 % Wrapper predicates defined in prolog.
@@ -258,7 +264,7 @@ fann_create_sparse(_, _, _, _, _, _, _, _) :- !, fail.
 
 fann_create_sparse_array(X, _, Y, Z) :-
         fann_create_sparse_array(X, Y, Z), !.
-fann_create_shortcut_array(_, _, _, _) :- !, fail.
+fann_create_sparse_array(_, _, _, _) :- !, fail.
 
 
 % First argument is the number of layers, but is ignored
@@ -292,7 +298,7 @@ fann_print_error( ErrorData ) :-
 		fann_get_errno( ErrorData, LastErrorNo ),
 		fann_get_errstr( ErrorData, LastErrorStr ),
 		ErrorMessage =.. [ error, LastErrorNo, LastErrorStr ],
-		print_message( plfann( ErrorMessage ) ), !.
+		print_message( error, plfann( ErrorMessage ) ), !.
 fann_print_error( _ ) :- !.
 
 fann_print_error :-

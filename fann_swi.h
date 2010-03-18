@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #ifndef __fann_swi_h__
 #define __fann_swi_h__
 
-FANN_EXTERNAL enum enum_fann_mode FANN_API fann_print_mode ( enum enum_fann_print_mode_switch value );
+FANN_EXTERNAL enum enum_fann_mode FANN_API fann_print_mode ( enum enum_fann_mode_switch value );
 
 #ifdef BUILD_FANN_WITH_SWI
 
@@ -62,7 +62,7 @@ enum line {
 // Make the library work with both native and
 // SWI-Prolog (via messages) console printing.
 
-FANN_EXTERNAL enum enum_fann_mode FANN_API fann_print_mode ( enum enum_fann_print_mode_switch value ) {
+FANN_EXTERNAL enum enum_fann_mode FANN_API fann_print_mode ( enum enum_fann_mode_switch value ) {
 
 	static enum enum_fann_print_mode mode = FANN_NATIVE;
 
