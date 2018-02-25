@@ -1,13 +1,28 @@
 LIBS=$(shell pkg-config --libs fann)
+VERSION=$(shell swipl -q -t "version(X),write(X)" pack.pl)
 
-default_target: plfann.so
+default_target: all
 
-plfann.so: plfann.c plfann.h
-	swipl-ld -o $@ -shared plfann.c $(LIBS)
+all:
+	make compile
+	make package
+
+compile:
+	swipl-ld -o bin/plfann -shared src/plfann.c $(LIBS)
+
+check::
+	swipl -q -g main,halt example.pl
+
+install:: package
+	swipl -t "pack_install('plfann-$(VERSION).tgz')"
+
+remove::
+	swipl -t "pack_remove(plfann)"
+	
+package: compile
+	tar zcvf "plfann-$(VERSION).tgz" pack.pl prolog/plfann.pl bin/plfann.so
 
 clean::
-	rm -f *~ *.so
-	rm xor_float.net
+	rm -f *~ ./*/*~ ./bin/*.so
 
-test::
-	swipl -q -t main example.pl
+

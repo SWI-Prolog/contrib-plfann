@@ -36,7 +36,8 @@ int main()
 
 */
 
-:- use_module('plfann').
+%:- use_module('plfann').
+:- use_module(library(plfann)).
 
 % Learning the XOR Function.
 % --------------------------
@@ -57,9 +58,7 @@ main:- fann_create_standard( 3, 2, 3, 1, Ann ),
 
    % Insert the proper paths below
 
-   %fann_train_on_file( Ann, "E:/MY_DOCUMENTS/Visual Studio 2008/Projects/fann-2.1.0/MicrosoftWindowsDll/xor.data", 500000, 1000, 0.00001 ),
-   fann_train_on_file( Ann, "./xor.data", 500000, 1000, 0.00001 ),
+   fann_train_on_file( Ann, "xor.data", 500000, 1000, 0.00001 ),
    nl,
-   %fann_save( Ann, "E:/MY_DOCUMENTS/Visual Studio 2008/Projects/fann-2.1.0/MicrosoftWindowsDll/xor_float.net" ),
-   fann_save( Ann, "./xor_float.net" ),
+   fann_save( Ann, "xor_float.net" ),
    fann_destroy( Ann ).
