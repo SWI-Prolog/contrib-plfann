@@ -41,7 +41,7 @@ To find out how to use this library follow [Documentation of FANN](http://leenis
 
 ## Installation
 
-1. First [instal fann](http://leenissen.dk/fann/wp/help/installing-fann/)!
+1. First [install fann](http://leenissen.dk/fann/wp/help/installing-fann/)!
 
 1. If you already have fann, compile code by `make` and install in swipl:
 
