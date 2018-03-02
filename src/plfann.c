@@ -3073,6 +3073,25 @@ foreign_t swi_fann_print_error ( term_t error_data_pt ) {
 	PL_succeed;
 }
 
+FANN_EXTERNAL enum enum_fann_mode FANN_API fann_print_mode ( enum enum_fann_mode_switch value ) {
+
+	static enum enum_fann_mode mode = FANN_NATIVE;
+
+    if ( value == FANN_GET_MODE )
+
+		return mode;
+
+	else {
+
+		if ( value == FANN_SET_SWI )
+
+			mode = FANN_SWI;
+		else
+			mode = FANN_NATIVE;
+
+		return mode;
+	}
+}
 
 // Make the library work with both native and
 // SWI-Prolog (via messages) console printing.

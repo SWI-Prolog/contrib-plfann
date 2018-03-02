@@ -20,8 +20,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #ifndef __fann_swi_h__
 #define __fann_swi_h__
 
-FANN_EXTERNAL enum enum_fann_mode FANN_API fann_print_mode ( enum enum_fann_mode_switch value );
-
 #ifdef BUILD_FANN_WITH_SWI
 
 #include <stdio.h>
@@ -39,19 +37,6 @@ FANN_EXTERNAL enum enum_fann_mode FANN_API fann_print_mode ( enum enum_fann_mode
 #define EXIT_FAILURE 1
 #endif
 
-enum enum_fann_print_mode {
-
-	FANN_NATIVE = 0,
-	FANN_SWI
-};
-
-enum enum_fann_mode_switch {
-
-	FANN_SET_NATIVE = 0,
-	FANN_SET_SWI,
-	FANN_GET_MODE
-};
-
 enum line {
 
 	AT_START = 0,
@@ -62,31 +47,11 @@ enum line {
 // Make the library work with both native and
 // SWI-Prolog (via messages) console printing.
 
-FANN_EXTERNAL enum enum_fann_mode FANN_API fann_print_mode ( enum enum_fann_mode_switch value ) {
-
-	static enum enum_fann_print_mode mode = FANN_NATIVE;
-
-    if ( value == FANN_GET_MODE )
-
-		return mode;
-
-	else {
-
-		if ( value == FANN_SET_SWI )
-
-			mode = FANN_SWI;
-		else
-			mode = FANN_NATIVE;
-
-		return mode;
-	}
-}
-
 
 unsigned int FANN_API fann_swi_printf ( const char * format_string, ... ) {
 
 	unsigned int length, exit = EXIT_SUCCESS;
-	enum enum_fann_print_mode mode = fann_print_mode ( FANN_GET_MODE );
+	enum enum_fann_mode mode = fann_print_mode ( FANN_GET_MODE );
 	static enum line next_position = AT_START;
 	term_t message_pt, out_pt, type_pt;
 	static char buff[ sizeof ( char * ) << 10 ];

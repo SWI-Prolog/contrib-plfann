@@ -214,8 +214,7 @@
 
 fann_swi_mode :- fann_print_mode( 'FANN_SWI' ).
 
-% It do not work!!! Why?
-%:- fann_swi_mode.
+:- fann_swi_mode.
 
 
 % Wrapper predicates defined in prolog.

@@ -1,14 +1,13 @@
 LIBS=$(shell pkg-config --libs fann)
 VERSION=$(shell swipl -q -t "version(X),write(X)" pack.pl)
+CFLAGS=-O2 -march -fomit-frame-pointer -s
 
 default_target: all
 
-all:
-	make compile
-	make package
+all: package
 
 compile:
-	swipl-ld -o bin/plfann -shared src/plfann.c $(LIBS)
+	swipl-ld -o bin/plfann -shared $(CFLAGS) src/plfann.c $(LIBS)
 
 check::
 	swipl -q -g main,halt example.pl
