@@ -1,6 +1,6 @@
 LIBS=$(shell pkg-config --libs fann)
 VERSION=$(shell swipl -q -t "version(X),write(X)" pack.pl)
-CFLAGS=-O2 -march -fomit-frame-pointer -s
+CFLAGS:=$(CFLAGS) -O2 -march -fomit-frame-pointer -s
 
 default_target: all
 
