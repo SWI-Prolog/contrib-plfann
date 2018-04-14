@@ -19,7 +19,7 @@ remove::
 	swipl -g "pack_remove(plfann),halt"
 	
 package: compile
-	tar zcvf "plfann-$(VERSION).tgz" pack.pl prolog/plfann.pl bin/plfann.so
+	tar zcvf "plfann-$(VERSION).tgz" pack.pl prolog/plfann.pl bin/plfann.so README.md
 
 clean::
 	rm -f *~ ./*/*~ ./bin/*.so
