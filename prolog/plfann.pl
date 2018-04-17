@@ -207,9 +207,7 @@
     ]).
 
 
-%:- load_foreign_library( foreign( plfann ) ).
-
-:- use_foreign_library('../bin/plfann').
+:- load_foreign_library( foreign( plfann ) ).
 
 
 fann_swi_mode :- fann_print_mode( 'FANN_SWI' ).
