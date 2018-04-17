@@ -7,8 +7,9 @@ default_target: all
 all: package
 
 compile:
-	swipl-ld -o bin/plfann -shared $(CFLAGS) src/plfann.c $(LIBS)
-
+	swipl-ld -o bin/plfann -shared $(CFLAGS) src/plfann.c $(LIBS) -Wno-unused-result
+	swipl-ld -o bin/plfann_double -shared $(CFLAGS) -DDOUBLEFANN src/plfann.c $(LIBS) -Wno-unused-result
+	swipl-ld -o bin/plfann_fixed -shared $(CFLAGS) -DFIXEDFANN src/plfann.c $(LIBS) -Wno-unused-result
 check::
 	swipl -q -g main,halt example.pl
 
