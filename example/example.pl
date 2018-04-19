@@ -36,7 +36,6 @@ int main()
 
 */
 
-%:- use_module('plfann').
 :- use_module(library(plfann)).
 
 % Learning the XOR Function.

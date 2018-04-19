@@ -7,6 +7,7 @@
         % Specific to plfann (3)
 
         fann_type/1,
+        fann_set_type/1,
         fann_error/1,
         fann_swi_mode/0,
         fann_print_mode/1,
@@ -213,6 +214,21 @@
 fann_swi_mode :- fann_print_mode( 'FANN_SWI' ).
 
 :- fann_swi_mode.
+
+fann_set_type(X):-
+	var(X),!,fail.
+fann_set_type('FANN_FLOAT'):-
+	ignore(unload_foreign_library(foreign(plfann_double))),
+	ignore(unload_foreign_library(foreign(plfann_fixed))),
+	load_foreign_library(foreign(plfann)).
+fann_set_type('FANN_DOUBLE'):-
+	ignore(unload_foreign_library(foreign(plfann))),
+	ignore(unload_foreign_library(foreign(plfann_fixed))),
+	load_foreign_library(foreign(plfann_double)).
+fann_set_type('FANN_FIXED'):-
+	ignore(unload_foreign_library(foreign(plfann_double))),
+	ignore(unload_foreign_library(foreign(plfann))),
+	load_foreign_library(foreign(plfann_fixed)).
 
 
 % Wrapper predicates defined in prolog.

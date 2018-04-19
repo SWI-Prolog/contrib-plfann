@@ -1,29 +1,28 @@
 LIBS=$(shell pkg-config --libs fann)
 VERSION=$(shell swipl -q -t "version(X),write(X)" pack.pl)
-CFLAGS:=$(CFLAGS) -O2 -fomit-frame-pointer -s -Wno-unused-result
-TARGET=plfann
-SOBJ=$(PACKSODIR)/$(TARGET).$(SOEXT)
+override CFLAGS += -O2 -fomit-frame-pointer -s -c -Wno-unused-result
+LD=swipl-ld
 
 default_target: package
 
-all: $(SOBJ)
+all: $(PACKSODIR)/plfann.$(SOEXT) $(PACKSODIR)/plfann_double.$(SOEXT) $(PACKSODIR)/plfann_fixed.$(SOEXT)
 
-$(SOBJ): c/$(TARGET).o
+$(PACKSODIR)/%.$(SOEXT): c/%.o
 	mkdir -p $(PACKSODIR)
-	$(LD) $(LDSOFLAGS) -o $@ $(SWISOLIB) $< $(LIBS)
+	$(LD) $(LDSOFLAGS) $(LIBS) -o $@ $(SWISOLIB) $<
 	strip -x $@
 
+c/%.o: c/%.c
+	$(CC) $(CFLAGS) $(LIBS) -o $@ $<
 
-compile: bin
-	swipl-ld -o bin/plfann -shared $(CFLAGS) c/plfann.c $(LIBS) -Wno-unused-result
-	swipl-ld -o bin/plfann_double -shared $(CFLAGS) -DDOUBLEFANN c/plfann.c $(LIBS) -Wno-unused-result
-	swipl-ld -o bin/plfann_fixed -shared $(CFLAGS) -DFIXEDFANN c/plfann.c $(LIBS) -Wno-unused-result
+c/plfann_double.o: c/plfann.c
+	$(CC) $(CFLAGS) $(LIBS) -o $@ -DDOUBLEFANN $<
 
-bin:
-	mkdir -p bin
+c/plfann_fixed.o: c/plfann.c
+	$(CC) $(CFLAGS) $(LIBS) -o $@ -DFIXEDFANN $<
 
 check::
-	swipl -q -g main,halt example/example.pl
+	$(MAKE) -C example
 
 install:
 install-me:: package
@@ -32,10 +31,10 @@ install-me:: package
 remove::
 	swipl -g "pack_remove(plfann),halt"
 	
-package:
+package: clean
 	tar zcvf "plfann-$(VERSION).tgz" pack.pl prolog c example README.md Makefile
 
 clean::
-	rm -rf *~ ./*/*~ bin
+	rm -rf *~ ./*/*~ ./*/*.o
 
 
