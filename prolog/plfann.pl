@@ -1,4 +1,97 @@
+/** <module> SWI-Prolog for "Fast Artificial Neural Network Library"
 
+The  enclosed files,  fann_swi.h, plfann.h, plfann.c and plfann.pl form the SWI-
+Prolog bindings  to the Fast Artificial Neural Network  library. fann is an open
+source ANN-library and is released under the LGPL.
+
+The version of the library for which these bindings are intended to be used with
+is  version  2.1.0.  Functions foreseen  to be  available in  release 2.2.0  are
+equally included, but have been commented out.
+
+On the  fann home page, links  are provided to  the Source  Code, the  Reference
+Manual and additionally, more general, materials related to ANN's.
+
+fann home page: http://leenissen.dk/fann/
+
+All available functions are implemented, with the exception of:
+
+     1. fann_create_train_from_callback
+     2. fann_set_callback
+
+In total 150 public predicates are defined.
+
+
+The  predicate names, used in  this library,  are the  same as the  ones in  the
+reference manual. C-Function-return-arguments  are added  as an additional  (and
+last) argument  to the  predicates concerned.  In a small  number of  functions,
+having length values, like  f.e. the length of  an input array, these  arguments
+have been removed, as these can be obtained in the prolog interface at relative-
+ly low cost.
+
+fann can use floats,  doubles or fixed point  (not for training)  representation
+internally, uncomment the appropriate variable definition in plfann.h.
+
+
+Three additional functions/predicates have been added:
+
+    1. fann_type(-Type)
+
+        Unifies Type with 'FANN_FLOAT', 'FANN_DOUBLE' or 'FANN_FIXED', depending
+        on the compilation of the library.
+
+    2. fann_error(+ErrorData)
+
+        Is true if an error occurred. ErrorData refers to the ErrorData set by
+        fann_set_error_log/2, or if no ErrorData is specifically set, to 'NULL'.
+        The latter is equivalent to calling fann_print_error/0.
+
+    3. fann_print_mode(?Mode)
+
+        Sets  the printing  of the  library to  either  standard  output  device
+        (Mode = 'FANN_NATIVE') or  the  SWI-Prolog  console (Mode = 'FANN_SWI').
+        In the latter case, the SWI_Prolog message system is used to this end.
+
+        The loading of the plfann-library  (i.e. on startup of SWI-Prolog) auto-
+        matically sets the printing mode to 'FANN_SWI'.
+
+        When called with a free  variable, Mode unifies  with the current  print
+        mode, either 'FANN_SWI' or 'FANN_NATIVE'.
+
+
+The idea of the  above is to ALSO be able  to build just one library (as opposed
+to fann and plfann) with  the SWI-Prolog bindings included  and still be able to
+use the same library both directly from C/C++ and SWI-Prolog.
+
+In order  for this to work, the header-file  fann_swi.h will need to be included
+in fann.h, by adding the line '#include "fann_swi.h"' (without the single quotes)
+after the other #include statements (around line 140).
+
+The macro BUILD_FANN_WITH_SWI will  need to be defined, when  building the  fann
+library.
+
+The header-file fann_swi.h will need to be copied/moved to the "../src/include/"
+directory of the source distribution, this is also where "fann.h" is located.
+
+The result is that iff the library is loaded through SWI-Prolog, the printing of
+all output of the library will be directed to the SWI-Prolog console. If  loaded
+by another application or library, the standard output is used by default. It is
+possible to override this behaviour, both from c and from prolog, see fann_swi.h
+for details.
+
+fann can use floats,  doubles or fixed point  (not for training)  representation
+internally, uncomment the appropriate macro definition in plfann.h.
+
+There  are some issues  with saving networks  to file. See post "Patch to ensure
+locale independancy", http://leenissen.dk/fann/forum/viewtopic.php?f=2&t=595 . A
+patch is posted.
+
+dated: 18.12.2009
+
+@author Degski
+@author PiotrLi
+
+@license LGPL
+*/
 :- module( plfann, [
 
         % When using version 2.2.0, uncomment the
@@ -210,10 +303,18 @@
 
 :- load_foreign_library( foreign( plfann ) ).
 
+%!	fann_type(-Type) is det
+%
+%	Unifies Type with 'FANN_FLOAT', 'FANN_DOUBLE' or 'FANN_FIXED', depending
+%	on the compilation of the library.
 
-fann_swi_mode :- fann_print_mode( 'FANN_SWI' ).
-
-:- fann_swi_mode.
+%!	fann_set_type(+Type) is det
+%
+%	Sets the library depending type of compilation.
+%
+%	You can choose 'FANN_FLOAT', 'FANN_DOUBLE' or 'FANN_FIXED'
+%
+%	@see fann_type/1
 
 fann_set_type(X):-
 	var(X),!,fail.
@@ -230,11 +331,31 @@ fann_set_type('FANN_FIXED'):-
 	ignore(unload_foreign_library(foreign(plfann))),
 	load_foreign_library(foreign(plfann_fixed)).
 
+%!	fann_swi_mode is det
+%
+%	Sets the printing of the library to the SWI-Prolog console.
+
+fann_swi_mode :- fann_print_mode( 'FANN_SWI' ).
+
+%!	fann_print_mode(?Mode) is det
+%
+%	Sets  the printing  of the  library to  either  standard  output  device
+%	(Mode = 'FANN_NATIVE') or  the  SWI-Prolog  console (Mode = 'FANN_SWI').
+%	In the latter case, the SWI_Prolog message system is used to this end.
+%
+%	The loading of the plfann-library  (i.e. on startup of SWI-Prolog) auto-
+%	matically sets the printing mode to 'FANN_SWI'.
+%
+%	When called with a free  variable, Mode unifies  with the current  print
+%	mode, either 'FANN_SWI' or 'FANN_NATIVE'.
+
+:- fann_swi_mode.
 
 % Wrapper predicates defined in prolog.
 % -------------------------------------
 
-% First argument is the number of layers, but is ignored
+%!	fann_create_standard(_,A,B,X)
+%	@bug First argument is the number of layers, but is ignored
 
 fann_create_standard(_, A, B, X) :-
         fann_create_standard_array([ A, B], X), !.
@@ -249,15 +370,17 @@ fann_create_standard(_, A, B, C, D, E, X) :-
         fann_create_standard_array([ A, B, C, D, E], X), !.
 fann_create_standard(_, _, _, _, _, _, _) :- !, fail.
 
+%!	fann_create_standard_array(X,Y)
 
-% First argument is the number of layers, but is ignored
+%!	fann_create_standard_array(_,X,Y)
+%	@bug First argument is the number of layers, but is ignored
 
 fann_create_standard_array(_, X, Y) :-
         fann_create_standard_array(X, Y), !.
 fann_create_standard_array(_, _, _) :- !, fail.
 
-
-% First argument is the number of layers, but is ignored
+%!	fann_create_sparse(Y,_,A,B,X)
+%	@bug First argument is the number of layers, but is ignored
 
 fann_create_sparse(Y, _, A, B, X) :-
         fann_create_sparse_array(Y, [ A, B], X), !.
@@ -272,15 +395,15 @@ fann_create_sparse(Y, _, A, B, C, D, E, X) :-
         fann_create_sparse_array(Y, [ A, B, C, D, E], X), !.
 fann_create_sparse(_, _, _, _, _, _, _, _) :- !, fail.
 
-
-% First argument is the number of layers, but is ignored
+%!	fann_create_sparse_array(X,_,Y,Z)
+%	@bug First argument is the number of layers, but is ignored
 
 fann_create_sparse_array(X, _, Y, Z) :-
         fann_create_sparse_array(X, Y, Z), !.
 fann_create_sparse_array(_, _, _, _) :- !, fail.
 
-
-% First argument is the number of layers, but is ignored
+%!	fann_create_shortcut(_,A,B,X)
+%	@bug First argument is the number of layers, but is ignored
 
 fann_create_shortcut(_, A, B, X) :-
         fann_create_shortcut_array([ A, B], X), !.
@@ -295,8 +418,10 @@ fann_create_shortcut(_, A, B, C, D, E, X) :-
         fann_create_shortcut_array([ A, B, C, D, E], X), !.
 fann_create_shortcut(_, _, _, _, _, _, _) :- !, fail.
 
+%!	fann_create_shortcut_array(+X:list,-Y:var) is det
 
-% First argument is the number of layers, but is ignored
+%!	fann_create_shortcut_array(_ ,X,Y)
+%	@bug First argument is the number of layers, but is ignored
 
 fann_create_shortcut_array(_, X, Y) :-
         fann_create_shortcut_array( X, Y), !.
@@ -305,6 +430,14 @@ fann_create_shortcut_array(_, _, _) :- !, fail.
 
 % Error Printing through the SWI-Prolog Message system.
 % -----------------------------------------------------
+
+%! fann_error(+ErrorData)
+%
+%	Is true if an error occurred. ErrorData refers to the ErrorData set by
+%	fann_set_error_log/2, or if no ErrorData is specifically set, to 'NULL'.
+%	The latter is equivalent to calling fann_print_error/0.
+
+%!	fann_print_error(ErrorData)
 
 fann_print_error( ErrorData ) :-
 		fann_error( ErrorData ),

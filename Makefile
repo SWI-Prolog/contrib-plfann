@@ -25,8 +25,8 @@ check::
 	$(MAKE) -C example
 
 install:
-install-me:: package
-	swipl -g "pack_install('plfann-$(VERSION).tgz',[upgrade(true)]),halt"
+install-me::
+	swipl -g "pack_install(.,[upgrade(true)]),halt"
 
 remove::
 	swipl -g "pack_remove(plfann),halt"
