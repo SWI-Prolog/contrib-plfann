@@ -1,7 +1,7 @@
 /** <module> SWI-Prolog for "Fast Artificial Neural Network Library"
 
-The  enclosed files,  fann_swi.h, plfann.h, plfann.c and plfann.pl form the SWI-
-Prolog bindings  to the Fast Artificial Neural Network  library. fann is an open
+The  enclosed files plfann.h, plfann.c and plfann.pl form the SWI-Prolog
+bindings  to the Fast Artificial Neural Network  library. fann is an open
 source ANN-library and is released under the LGPL.
 
 The version of the library for which these bindings are intended to be used with
@@ -427,7 +427,6 @@ fann_create_shortcut_array(_, X, Y) :-
         fann_create_shortcut_array( X, Y), !.
 fann_create_shortcut_array(_, _, _) :- !, fail.
 
-
 % Error Printing through the SWI-Prolog Message system.
 % -----------------------------------------------------
 
@@ -446,6 +445,8 @@ fann_print_error( ErrorData ) :-
 		ErrorMessage =.. [ error, LastErrorNo, LastErrorStr ],
 		print_message( error, plfann( ErrorMessage ) ), !.
 fann_print_error( _ ) :- !.
+
+%!	fann_print_error
 
 fann_print_error :-
         fann_print_error( 'NULL' ), !.

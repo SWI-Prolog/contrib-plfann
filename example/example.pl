@@ -41,23 +41,46 @@ int main()
 % Learning the XOR Function.
 % --------------------------
 
-main:- fann_create_standard( 3, 2, 3, 1, Ann ),
+main:-
+    training,
+    execution.
 
-   % More economical would be:
-   % fann_create_standard( [2, 3, 1], Ann ),
+training:-
+    fann_create_standard( 3, 2, 3, 1, Ann ),
 
-   nl,
-   fann_print_connections( Ann ),
-   nl,
-   fann_print_parameters( Ann ),
-   nl,
+    % More economical would be:
+    % fann_create_standard( [2, 3, 1], Ann ),
 
-   fann_set_activation_function_hidden( Ann, 'FANN_SIGMOID_SYMMETRIC' ),
-   fann_set_activation_function_output( Ann, 'FANN_SIGMOID_SYMMETRIC' ),
+    nl,
+    fann_print_connections( Ann ),
+    nl,
+    fann_print_parameters( Ann ),
+    nl,
 
-   % Insert the proper paths below
+    fann_set_activation_function_hidden( Ann, 'FANN_SIGMOID_SYMMETRIC' ),
+    fann_set_activation_function_output( Ann, 'FANN_SIGMOID_SYMMETRIC' ),
 
-   fann_train_on_file( Ann, "xor.data", 500000, 1000, 0.00001 ),
-   nl,
-   fann_save( Ann, "xor_float.net" ),
-   fann_destroy( Ann ).
+    % Insert the proper paths below
+
+    fann_train_on_file( Ann, "xor.data", 500000, 1000, 0.00001 ),
+    nl,
+    fann_save( Ann, "xor_float.net" ),
+    fann_destroy( Ann ).
+
+execution:-
+    fann_create_from_file("xor_float.net",Ann),
+    I1= -1,
+    I2= 1,
+    fann_run(Ann,[I1,I2],Out),
+    format('xor test (~f,~f) -> ',[I1,I2]),
+    write(Out),nl,
+    fann_destroy(Ann).
+
+
+
+
+
+
+
+
+

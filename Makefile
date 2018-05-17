@@ -25,16 +25,16 @@ check::
 	$(MAKE) -C example
 
 install:
-install-me::
-	swipl -g "pack_install(.,[upgrade(true)]),halt"
+install-me:
+	swipl -g "pack_install('file:.',[upgrade(true)]),halt" > stdout
 
-remove::
+remove:
 	swipl -g "pack_remove(plfann),halt"
 	
 package: clean
 	tar zcvf "plfann-$(VERSION).tgz" pack.pl prolog c example README.md Makefile
 
-clean::
+clean:
 	rm -rf *~ ./*/*~ ./*/*.o
 
 
