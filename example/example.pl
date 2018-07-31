@@ -1,3 +1,11 @@
+:- use_module(library(plfann)).
+
+% Learning the XOR Function.
+% --------------------------
+
+main:-
+    training,
+    execution.
 
 /*
 
@@ -36,51 +44,57 @@ int main()
 
 */
 
-:- use_module(library(plfann)).
-
-% Learning the XOR Function.
-% --------------------------
-
-main:-
-    training,
-    execution.
-
 training:-
-    fann_create_standard( 3, 2, 3, 1, Ann ),
+	%fann_create_standard(+Num_layers,+Num_input,+Num_neurons_hidden,+Num_output,-Ann) is det
+	fann_create_standard( 3, 2, 3, 1, Ann ),
+	
+	% More economical would be:
+	% fann_create_standard( [2, 3, 1], Ann ),
 
-    % More economical would be:
-    % fann_create_standard( [2, 3, 1], Ann ),
+	nl,
+	fann_print_connections( Ann ),
+	nl,
+	fann_print_parameters( Ann ),
+	nl,
 
-    nl,
-    fann_print_connections( Ann ),
-    nl,
-    fann_print_parameters( Ann ),
-    nl,
+	fann_set_activation_function_hidden( Ann, 'FANN_SIGMOID_SYMMETRIC' ),
+	fann_set_activation_function_output( Ann, 'FANN_SIGMOID_SYMMETRIC' ),
 
-    fann_set_activation_function_hidden( Ann, 'FANN_SIGMOID_SYMMETRIC' ),
-    fann_set_activation_function_output( Ann, 'FANN_SIGMOID_SYMMETRIC' ),
+	% Insert the proper paths below
 
-    % Insert the proper paths below
+	%fann_train_on_file(+Ann,+File,+Max_epochs,+Epochs_between_reports,+Desired_error) is det
+	fann_train_on_file( Ann, "xor.data", 500000, 1000, 0.00001 ),
+	nl,
+	fann_save( Ann, "xor_float.net" ),
+	fann_destroy( Ann ).
 
-    fann_train_on_file( Ann, "xor.data", 500000, 1000, 0.00001 ),
-    nl,
-    fann_save( Ann, "xor_float.net" ),
-    fann_destroy( Ann ).
+/*
+
+#include <stdio.h>
+#include "floatfann.h"
+
+int main()
+{
+    fann_type *calc_out;
+    fann_type input[2];
+
+    struct fann *ann = fann_create_from_file("xor_float.net");
+
+    input[0] = -1;
+    input[1] = 1;
+    calc_out = fann_run(ann, input);
+
+    printf("xor test (%f,%f) -> %f\n", input[0], input[1], calc_out[0]);
+
+    fann_destroy(ann);
+    return 0;
+}
+
+*/
 
 execution:-
-    fann_create_from_file("xor_float.net",Ann),
-    I1= -1,
-    I2= 1,
-    fann_run(Ann,[I1,I2],Out),
-    format('xor test (~f,~f) -> ',[I1,I2]),
-    write(Out),nl,
-    fann_destroy(Ann).
-
-
-
-
-
-
-
-
-
+	fann_create_from_file("xor_float.net",Ann),
+	fann_run(Ann,[-1,1],Out),
+	format('xor test (-1,1) -> ~f',Out),
+	nl,
+	fann_destroy(Ann).
