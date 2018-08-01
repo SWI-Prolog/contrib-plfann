@@ -26,7 +26,7 @@ check::
 
 install:
 install-me:
-	swipl -g "pack_install('file:.',[upgrade(true)]),halt" > stdout
+	swipl -g "pack_install('file:.',[upgrade(true)]),halt"
 
 remove:
 	swipl -g "pack_remove(plfann),halt"
